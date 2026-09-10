@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#D9788A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Vale, Kriss & Pepita</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF2EE;--bg2:#F7E8E4;--card:#FFFCFA;--rosa:#D9788A;--rosa-hondo:#B85668;
+  --rosa-luz:#F5D9DE;--rosa-claro:#FCEAE4;--salvia:#8FA678;--dorado:#CB9A63;
+  --tinta:#4E3B3F;--gris:#9A868A;--azul:#7E93A8;
+  --sombra:0 10px 30px rgba(184,86,104,.13);--sombra-sm:0 6px 16px rgba(184,86,104,.10);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html,body{background:var(--bg);height:100%;overscroll-behavior:none}
+body{font-family:'Nunito',sans-serif;color:var(--tinta);-webkit-font-smoothing:antialiased;user-select:none}
+
+/* fondo con corazones flotantes sutiles */
+.bg-hearts{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-hearts span{position:absolute;color:var(--rosa-luz);opacity:.5;font-size:16px;animation:float linear infinite}
+@keyframes float{0%{transform:translateY(105vh) scale(.6);opacity:0}10%{opacity:.5}90%{opacity:.5}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+
+.app{height:100dvh;display:flex;flex-direction:column;padding-top:var(--safe-t);position:relative;z-index:1}
+.top{flex:0 0 auto;padding:14px 20px 6px;display:flex;align-items:center;justify-content:space-between}
+.top .marca{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--rosa-hondo)}
+.top .marca span{color:var(--gris);font-weight:400}
+.gear{background:none;border:none;font-size:19px;color:var(--rosa-hondo);cursor:pointer;padding:4px;transition:transform .3s}
+.gear:active{transform:rotate(90deg)}
+
+.pages{flex:1 1 auto;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pages::-webkit-scrollbar{display:none}
+.page{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:center;overflow-y:auto;overflow-x:hidden;padding:2px 18px 24px;scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page>*{animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.fecha-hoy{text-align:center;font-size:13px;color:var(--gris);font-weight:700;margin-top:2px}
+.fecha-hoy::first-letter{text-transform:uppercase}
+
+/* mini calendario de días */
+.minical{display:flex;justify-content:space-between;gap:3px;margin:10px 4px 4px}
+.minical .d{flex:1;text-align:center;padding:6px 0;border-radius:12px;transition:.2s}
+.minical .d .dl{font-size:9px;color:var(--gris);font-weight:700;text-transform:uppercase}
+.minical .d .dn{font-size:15px;color:var(--tinta);font-weight:700;margin-top:2px}
+.minical .d.hoy{background:var(--rosa)}
+.minical .d.hoy .dl,.minical .d.hoy .dn{color:#fff}
+
+/* feto sobre luz cálida (estilo foto) */
+/* FRUTA 3D protagonista */
+.fruta3d-stage{position:relative;text-align:center;margin:6px 0 4px}
+.scene{width:180px;height:180px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.orb{position:relative;animation:bob 3.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-12px) scale(1.03)}}
+.orb svg{display:block;width:150px;height:150px;filter:drop-shadow(0 14px 16px rgba(150,80,60,.28))}
+.orb .glow{position:absolute;top:16%;left:22%;width:28%;height:24%;background:radial-gradient(circle,rgba(255,255,255,.9),transparent 70%);border-radius:50%;pointer-events:none;animation:glow 4s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.85;transform:translate(0,0)}50%{opacity:.5;transform:translate(9px,5px)}}
+.fruta-floor{width:90px;height:15px;background:rgba(150,80,60,.16);border-radius:50%;filter:blur(5px);margin:-6px auto 8px;animation:sh 3.5s ease-in-out infinite}
+@keyframes sh{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(.78);opacity:.28}}
+.fruta-cap{font-size:15px;color:var(--gris);font-weight:600}
+.fruta-cap b{font-family:'Fraunces',serif;font-size:24px;font-weight:500;color:var(--rosa-hondo)}
+.eco-cap{display:none}
+.feto-hero{display:none}
+.heartbeat{position:absolute;top:0;right:14px;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--rosa-hondo);font-weight:800;background:rgba(255,255,255,.7);padding:3px 8px;border-radius:20px;backdrop-filter:blur(4px);z-index:2}
+.heartbeat .bpm-dot{width:7px;height:7px;border-radius:50%;background:#E8697C;animation:beat 1s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+
+/* HERO semana */
+.week-hero{text-align:center;padding:6px 0 0}
+.wk-num{font-family:'Fraunces',serif;font-weight:400;font-size:64px;line-height:.9;color:var(--rosa-hondo);letter-spacing:-2px}
+.wk-lbl{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:var(--rosa);margin-top:2px}
+.wk-day{font-size:11.5px;color:var(--gris);margin-top:5px;font-weight:600}
+.wk-fechas{font-size:11px;color:var(--gris);text-align:center;margin-top:6px;line-height:1.5;padding:0 6px}
+.wk-fechas b{color:var(--rosa-hondo)}
+.progress{margin:14px 6px 4px;height:9px;background:var(--rosa-luz);border-radius:10px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--rosa),var(--dorado));border-radius:10px;transition:width 1s ease;position:relative}
+.progress i::after{content:"";position:absolute;right:0;top:0;bottom:0;width:14px;background:rgba(255,255,255,.5);border-radius:10px}
+.progress-lbl{font-size:11px;color:var(--gris);text-align:center;margin-top:6px;font-weight:700}
+
+/* ECO card */
+.eco-wrap{display:none}
+
+/* tamaño / fruta */
+.size{background:var(--card);border-radius:22px;box-shadow:var(--sombra-sm);margin:12px 0;padding:16px 18px;text-align:center}
+.size .cap{font-size:12px;color:var(--gris);font-weight:600}
+.size .row{display:flex;align-items:center;justify-content:center;gap:12px;margin:6px 0}
+.size svg{width:58px;height:58px}
+.size .name{font-family:'Fraunces',serif;font-size:24px;font-weight:500;color:var(--rosa-hondo)}
+.size-nota{font-size:12px;color:var(--gris);font-weight:600;margin-top:-2px}
+.size-nota:empty{display:none}
+.stats{display:flex;margin-top:12px;border-top:1px solid var(--rosa-luz);padding-top:12px}
+.stats div{flex:1}
+.stats b{display:block;font-family:'Fraunces',serif;font-size:18px;font-weight:500;color:var(--tinta)}
+.stats span{font-size:9.5px;color:var(--gris);font-weight:600;display:block;line-height:1.25}
+.stats .hr{color:var(--rosa-hondo)}
+
+.today-line{font-family:'Fraunces',serif;font-size:19px;line-height:1.5;color:var(--tinta);text-align:center;padding:8px 6px 2px;font-weight:500}
+.hint{text-align:center;font-size:11px;color:var(--gris);font-weight:700;margin-top:14px;opacity:.8;animation:sway 2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+.hint b{color:var(--rosa)}
+
+/* bloques info */
+.sec-tit{font-family:'Fraunces',serif;font-weight:500;font-size:15px;color:var(--rosa-hondo);display:flex;align-items:center;gap:7px;margin:16px 2px 8px}
+.sec-tit .e{font-size:17px}
+.block{background:var(--card);border-radius:18px;padding:14px 16px;font-size:14px;line-height:1.55;box-shadow:var(--sombra-sm);margin-bottom:4px}
+.block.act{background:#F0F4EA;box-shadow:0 6px 16px rgba(143,166,120,.14)}
+.block.care{background:#ECF0F4;box-shadow:0 6px 16px rgba(120,140,166,.13)}
+
+.wow{background:linear-gradient(145deg,var(--rosa-hondo),var(--rosa));color:#fff;border-radius:20px;padding:18px;margin-bottom:4px;box-shadow:var(--sombra)}
+.wow .k{font-size:10.5px;font-weight:800;letter-spacing:.5px;opacity:.85;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.wow .v{font-family:'Fraunces',serif;font-size:16px;line-height:1.45;margin-top:6px;font-weight:500}
+.dato-dia-box{background:var(--card);border-radius:16px;padding:13px 15px;margin:8px 0 4px;box-shadow:var(--sombra-sm);font-size:13.5px;line-height:1.5;color:var(--tinta)}
+.dato-dia-box .dd-k{display:block;font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--dorado);text-transform:uppercase;margin-bottom:4px}
+
+/* frase motivacional destacada */
+.frase{background:linear-gradient(160deg,#FFF6F2,#FBE6DF);border:1.5px solid var(--rosa-luz);border-radius:22px;padding:22px 20px;margin:6px 0;text-align:center;position:relative}
+.frase::before{content:"❞";font-family:'Fraunces',serif;position:absolute;top:2px;left:16px;font-size:40px;color:var(--rosa-luz);line-height:1}
+.frase .txt{font-family:'Fraunces',serif;font-style:italic;font-size:18px;line-height:1.5;color:var(--tinta)}
+.frase .de{font-size:11px;color:var(--rosa-hondo);font-weight:700;margin-top:10px;letter-spacing:.3px}
+
+/* rasgos: tarjetas de "cómo será" */
+.rasgo{background:var(--card);border-radius:16px;padding:13px 15px;margin-bottom:8px;box-shadow:var(--sombra-sm);display:flex;gap:11px;align-items:flex-start}
+.rasgo .ico{font-size:22px;flex:0 0 auto;margin-top:1px}
+.rasgo .cont h4{font-family:'Fraunces',serif;font-weight:500;font-size:14px;color:var(--rosa-hondo);margin-bottom:2px}
+.rasgo .cont p{font-size:13px;line-height:1.5;color:var(--tinta)}
+
+/* precauciones: normal vs alarma */
+.alert-tabs{display:flex;gap:8px;margin-bottom:10px}
+.alert-tab{flex:1;padding:9px;border-radius:12px;font-size:12px;font-weight:700;text-align:center;cursor:pointer;transition:.2s;border:1.5px solid transparent}
+.alert-tab.ok{background:#EFF5EA;color:#5E7248}.alert-tab.ok.on{background:var(--salvia);color:#fff}
+.alert-tab.warn{background:#FBEEE6;color:#B5703A}.alert-tab.warn.on{background:#D98A4A;color:#fff}
+.alert-list .item{border-radius:14px;padding:12px 14px;margin-bottom:8px;font-size:13px;line-height:1.5;display:flex;gap:9px;align-items:flex-start}
+.alert-list .item.ok{background:#F1F6EC}
+.alert-list .item.warn{background:#FBEDE3}
+.alert-list .item .d{flex:0 0 auto;font-weight:800}
+.alert-list .item.ok .d{color:var(--salvia)}
+.alert-list .item.warn .d{color:#D98A4A}
+.alert-note{font-size:11.5px;color:var(--gris);text-align:center;margin-top:6px;line-height:1.5;font-style:italic}
+
+/* timelines */
+.tl-title{font-family:'Fraunces',serif;font-weight:500;font-size:15px;color:var(--rosa-hondo);margin:8px 0 10px}
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--rosa-luz)}
+.tl{position:relative;margin-bottom:13px}
+.tl::before{content:"";position:absolute;left:-19px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--rosa-luz);border:2px solid var(--bg)}
+.tl.now::before{background:var(--rosa);box-shadow:0 0 0 4px var(--rosa-luz);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--rosa-luz)}50%{box-shadow:0 0 0 7px rgba(217,120,138,.2)}}
+.tl.done::before{background:var(--salvia)}
+.tl .w{font-size:11px;font-weight:800;color:var(--gris)}
+.tl .t{font-size:13px;font-weight:600;margin-top:1px}
+.tl.now .t{color:var(--rosa-hondo)}
+
+/* hito clínico destacado */
+.milestone{background:linear-gradient(150deg,#FBEDD8,#F7E1C6);border-radius:22px;padding:18px;margin:6px 0 14px}
+.milestone .tag{display:inline-block;background:var(--dorado);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.milestone h2{font-family:'Fraunces',serif;font-weight:500;font-size:19px;color:#7A5A2E;margin:9px 0 6px}
+.milestone p{font-size:13px;line-height:1.55;color:#7A5A2E}
+.checklist{list-style:none;margin-top:12px}
+.checklist li{background:rgba(255,255,255,.55);border-radius:13px;padding:10px 13px;font-size:12.5px;margin-bottom:7px;display:flex;gap:8px;align-items:flex-start;color:#6B4F28}
+.checklist li .dot{color:var(--dorado);font-weight:800;flex:0 0 auto}
+
+/* dots */
+.dots{flex:0 0 auto;display:flex;justify-content:center;gap:7px;padding:9px 0 calc(9px + var(--safe-b))}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--rosa-luz);transition:.3s}
+.dots i.on{background:var(--rosa);width:20px;border-radius:10px}
+
+/* sheet config */
+.sheet{position:fixed;inset:0;background:rgba(78,59,63,.4);z-index:50;display:none;align-items:flex-end;backdrop-filter:blur(3px)}
+.sheet.open{display:flex}
+.sheet-inner{background:var(--bg);width:100%;max-width:520px;margin:0 auto;border-radius:26px 26px 0 0;padding:22px 22px calc(26px + var(--safe-b));animation:up .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-inner h4{font-family:'Fraunces',serif;font-weight:500;font-size:20px;color:var(--rosa-hondo);margin-bottom:3px}
+.sheet-inner .s{font-size:12.5px;color:var(--gris);margin-bottom:16px}
+.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--gris);margin:14px 0 6px}
+.txt{width:100%;padding:13px 15px;border:1.5px solid var(--rosa-luz);border-radius:14px;background:var(--card);font-family:'Nunito';font-size:16px;font-weight:600;color:var(--tinta);outline:none}
+.txt:focus{border-color:var(--rosa)}
+.sexbar{display:flex;gap:6px}
+.sexbar button{flex:1;padding:13px 4px;border:1.5px solid var(--rosa-luz);border-radius:13px;background:var(--card);font-family:'Nunito';font-size:14px;font-weight:700;color:var(--gris);cursor:pointer;transition:.2s}
+.sexbar button.on{background:var(--rosa);color:#fff;border-color:var(--rosa);transform:scale(1.03)}
+.sheet-close{width:100%;margin-top:18px;padding:14px;border:none;border-radius:15px;background:var(--rosa-hondo);color:#fff;font-weight:700;font-size:15px;font-family:'Nunito';cursor:pointer}
+</style>
+</head>
+<body>
+<div class="bg-hearts" id="bgHearts"></div>
+<div class="app">
+  <div class="top">
+    <div class="marca">Vale, Kriss <span id="marca-bebe">&amp; Pepita</span></div>
+    <button class="gear" onclick="openSheet()">⚙</button>
+  </div>
+  <div class="pages" id="pages">
+
+    <!-- PÁGINA 1: HOY -->
+    <section class="page">
+      <div class="fecha-hoy" id="fecha"></div>
+      <div class="minical" id="minical"></div>
+
+      <div class="week-hero">
+        <div class="wk-num" id="wk-num">11</div>
+        <div class="wk-lbl" id="wk-lbl">semanas + 1 día</div>
+      </div>
+
+      <!-- FRUTA 3D protagonista -->
+      <div class="fruta3d-stage">
+        <div class="heartbeat"><span class="bpm-dot"></span><span id="bpm">155 lpm</span></div>
+        <div class="scene"><div class="orb" id="fruta3d"></div></div>
+        <div class="fruta-floor"></div>
+        <div class="fruta-cap"><span id="size-cap">del tamaño de un</span> <b id="size-name">higo</b></div>
+        <div class="size-nota" id="size-nota"></div>
+      </div>
+
+      <div class="stats">
+        <div><b id="st-len">4,5 cm</b><span id="st-len-lbl">largo</span></div>
+        <div><b id="st-wt">10 g</b><span>peso</span></div>
+        <div><b class="hr" id="st-hr">155</b><span>latidos</span></div>
+      </div>
+
+      <div class="progress"><i id="prog" style="width:0"></i></div>
+      <div class="progress-lbl" id="prog-lbl"></div>
+      <div class="wk-fechas" id="wk-fechas"></div>
+
+      <div class="hint">desliza <b>→</b> para ver más</div>
+    </section>
+
+    <!-- PÁGINA 2: SEMANA -->
+    <section class="page">
+      <div class="frase">
+        <div class="txt" id="frase-txt"></div>
+        <div class="de" id="frase-de">para ti, Vale</div>
+      </div>
+      <div class="wow"><div class="k">✨ Dato de la semana</div><div class="v" id="wow"></div></div>
+      <div class="dato-dia-box"><span class="dd-k">💡 Dato de hoy</span><span id="dato-dia"></span></div>
+      <div class="sec-tit"><span class="e">🌱</span><span id="b-baby-t">Pepita ahora</span></div>
+      <div class="block" id="b-baby"></div>
+      <div class="sec-tit"><span class="e">🌸</span>Tu cuerpo, Vale</div>
+      <div class="block" id="b-body"></div>
+      <div class="sec-tit"><span class="e">🤝</span>Kriss, tu apoyo de hoy</div>
+      <div class="block act" id="b-act"></div>
+      <div class="sec-tit"><span class="e">🌙</span>Y tú, Vale, cuídate</div>
+      <div class="block care" id="b-care"></div>
+    </section>
+
+    <!-- PÁGINA 3: ALERTAS -->
+    <section class="page">
+      <div class="sec-tit"><span class="e">🩺</span>¿Es normal o para preocuparse?</div>
+      <div class="alert-tabs">
+        <div class="alert-tab ok on" id="tab-ok" onclick="setAlert('ok')">Normal y esperable</div>
+        <div class="alert-tab warn" id="tab-warn" onclick="setAlert('warn')">Llama al doctor</div>
+      </div>
+      <div class="alert-list" id="alert-list"></div>
+      <div class="alert-note" id="alert-note"></div>
+    </section>
+
+    <!-- PÁGINA 4: ¿CÓMO SERÁ? -->
+    <section class="page">
+      <div class="sec-tit"><span class="e">💭</span>¿Cómo será Pepita?</div>
+      <div id="rasgos"></div>
+      <div class="alert-note">Todo esto ya está escrito en sus genes desde el primer día. Solo falta conocerla para descubrirlo.</div>
+    </section>
+
+    <!-- PÁGINA 5: CAMINO -->
+    <section class="page">
+      <div class="milestone">
+        <span class="tag" id="ms-tag">Ahora</span>
+        <h2 id="ms-title"></h2>
+        <p id="ms-desc"></p>
+        <ul class="checklist" id="ms-list"></ul>
+      </div>
+      <div class="tl-title">El camino de los exámenes</div>
+      <div class="timeline" id="timeline"></div>
+      <div class="tl-title" style="margin-top:22px">Los grandes hitos</div>
+      <div class="timeline" id="hitos"></div>
+    </section>
+
+  </div>
+  <div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+</div>
+
+<!-- CONFIG -->
+<div class="sheet" id="sheet">
+  <div class="sheet-inner">
+    <h4>Nuestra guagua</h4>
+    <div class="s">Cuando sepan el nombre y el sexo, cámbienlo acá. Todo se actualiza solo.</div>
+    <label class="lbl">¿Cómo se llama?</label>
+    <input id="in-nombre" class="txt" type="text" placeholder="Pepita" maxlength="20" autocomplete="off">
+    <label class="lbl">¿Qué viene?</label>
+    <div class="sexbar" id="sexbar-sheet">
+      <button data-s="x" class="on">Aún no</button>
+      <button data-s="f">Niña</button>
+      <button data-s="m">Niño</button>
+    </div>
+    <button class="sheet-close" onclick="guardar()">Listo</button>
+  </div>
+</div>
+
+<script>
+/* ====== CONFIG ====== */
+const FUR=new Date('2026-06-23T00:00:00');
+const KEY_N='vale_nombre', KEY_S='vale_sexo';
+let nombre=localStorage.getItem(KEY_N)||'Pepita';
+let sexo=localStorage.getItem(KEY_S)||'x';   // x / f / m
+let alertMode='ok';
+
+/* ====== FECHAS ====== */
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const MES_C=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIA_C=['dom','lun','mar','mié','jue','vie','sáb'];
+function hoy0(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function dias(){return Math.floor((hoy0()-FUR)/86400000);}
+function fechaDeSemana(s){const f=new Date(FUR);f.setDate(f.getDate()+s*7);return f;}
+function fmtCorto(f){return `${DIA_C[f.getDay()]} ${f.getDate()} ${MES_C[f.getMonth()]}`;}
+function fmtDiaMes(f){return `${f.getDate()} ${MES_C[f.getMonth()]}`;}
+function fmtLargo(f){return `${f.getDate()} de ${MESES[f.getMonth()]}`;}
+function coma(n){return String(n).replace('.',',');}
+
+/* ====== BIOMETRÍA (cm, g) - por evidencia ====== */
+const BIO={4:[.1,.5],5:[.3,.6],6:[.6,1],7:[1.3,2],8:[1.6,3],9:[2.3,4],10:[3.1,7],11:[4.1,10],12:[5.4,14],13:[7.4,30],14:[8.7,50],15:[10.1,80],16:[11.6,110],17:[13,150],18:[14.2,200],19:[15.3,260],20:[16.5,300],21:[26.7,400],22:[27.8,480],23:[28.9,550],24:[30,650],25:[34.6,780],26:[35.6,910],27:[36.6,1050],28:[37.6,1200],29:[38.6,1350],30:[39.9,1500],31:[41.1,1650],32:[42.4,1800],33:[43.7,2000],34:[45,2250],35:[46.2,2450],36:[47.4,2650],37:[48.6,2900],38:[49.8,3100],39:[50.7,3300],40:[51.5,3500]};
+const HR={4:"—",5:"100",6:"110",7:"120",8:"150",9:"170",10:"170",11:"160",12:"155",13:"150"}; // desde 14: ~145
+
+/* ====== FRUTAS [nombre, art, nota] ====== */
+const FRUTAS={4:["amapola","una"],5:["sésamo","un"],6:["lenteja","una"],7:["arándano","un"],8:["frambuesa","una"],9:["aceituna","una"],10:["ciruela","una"],11:["higo","un"],12:["lima","una"],13:["limón","un"],14:["durazno","un"],15:["manzana","una"],16:["palta","una"],17:["cebolla","una"],18:["pimentón","un"],19:["tomate","un"],20:["plátano","un"],21:["zanahoria","una"],22:["papaya","una"],23:["mango","un"],24:["choclo","un"],25:["coliflor","una"],26:["lechuga","una"],27:["repollo","un"],28:["berenjena","una"],29:["zapallo italiano","un"],30:["repollo","un","de unos 40 cm y 1,5 kg"],31:["coco","un"],32:["apio","un","entero, ~1,8 kg"],33:["piña","una"],34:["melón","un","tipo calameño, ~2,2 kg"],35:["melón","un","grande, ~2,5 kg"],36:["lechuga","una","grande, ~2,7 kg"],37:["zapallo italiano","un","grande, ~2,9 kg"],38:["zapallo","un","chico, ~3,1 kg"],39:["zapallo","un","mediano, ~3,3 kg"],40:["zapallo","un","chico de unos 50 cm y 3,5 kg"]};
+
+/* ====== ECOGRAFÍA SVG (realista, por etapa) ====== */
+/* ====== FETO REALISTA sobre luz cálida (estilo foto) ====== */
+
+/* ====== FRUTA SVG (referencia de tamaño, pequeña) ====== */
+function svgFruta(n){
+  const C={
+    "amapola":["#C77E64","round"],"sésamo":["#D8C088","seed"],"lenteja":["#A8BE7E","lens"],
+    "arándano":["#7C8FC0","berry"],"frambuesa":["#D46A86","rasp"],"aceituna":["#8CA35A","olive"],
+    "ciruela":["#8E5E92","plum"],"higo":["#7B4B6E","fig"],"lima":["#8FA84E","round"],
+    "limón":["#E3C34E","lemon"],"durazno":["#EFA070","round"],"manzana":["#E07A7A","apple"],
+    "palta":["#8CA35A","avo"],"cebolla":["#E6CFA8","onion"],"pimentón":["#E07A4A","pepper"],
+    "tomate":["#D85A4A","round"],"plátano":["#E3BE5A","banana"],"zanahoria":["#E08A44","carrot"],
+    "papaya":["#E09850","pear"],"mango":["#E3A85A","mango"],"choclo":["#E3C34E","corn"],
+    "coliflor":["#EAE2C4","round"],"lechuga":["#9CBE6E","leaf"],"repollo":["#8CAE64","round"],
+    "berenjena":["#8E5E92","eggplant"],"zapallo italiano":["#6E9450","zucchini"],
+    "coco":["#A87E4E","coco"],"apio":["#9CBE6E","celery"],"piña":["#E3B84E","pineapple"],
+    "melón":["#CBBE7A","round"],"zapallo":["#E08A44","pumpkin"]
+  };
+  const d=C[n]||["#D9788A","round"], base=d[0], shape=d[1];
+  const id='fg'+Math.abs(hashCode(n));
+  const g=`<radialGradient id="${id}" cx="38%" cy="28%" r="80%"><stop offset="0%" stop-color="${mix(base,'#ffffff',0.5)}"/><stop offset="55%" stop-color="${base}"/><stop offset="100%" stop-color="${mix(base,'#000000',0.4)}"/></radialGradient>`;
+  const hoja='<path d="M56 22 q9 -8 18 -4 q-4 10 -16 10 z" fill="#7E9A54"/>';
+  const tallo='<path d="M60 24 q2 -6 7 -8" stroke="#7A5A3A" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  let body;
+  switch(shape){
+    case 'fig': body=`${tallo}${hoja}<path d="M60 26 C52 26 50 36 48 46 C44 62 34 68 34 84 C34 100 46 110 60 110 C74 110 86 100 86 84 C86 68 76 62 72 46 C70 36 68 26 60 26Z" fill="url(#${id})"/><ellipse cx="60" cy="104" rx="5" ry="3" fill="#2A1620" opacity="0.55"/>`; break;
+    case 'banana': body=`<path d="M28 46 C36 88 84 98 98 68 C90 78 50 70 42 42 C38 42 30 42 28 46Z" fill="url(#${id})"/>`; break;
+    case 'carrot': body=`<path d="M60 34 L74 44 L64 108 L56 108 L46 44Z" fill="url(#${id})"/><g stroke="#7E9A54" stroke-width="3" fill="none" stroke-linecap="round"><path d="M60 34 l-11 -16"/><path d="M60 34 l0 -18"/><path d="M60 34 l11 -16"/></g>`; break;
+    case 'lemon': body=`<ellipse cx="60" cy="62" rx="30" ry="42" fill="url(#${id})"/><circle cx="60" cy="20" r="4" fill="#7E9A54"/>`; break;
+    case 'oval': case 'mango': body=`<ellipse cx="60" cy="64" rx="34" ry="44" fill="url(#${id})"/>${hoja}`; break;
+    case 'pear': case 'papaya': body=`<path d="M60 26 C54 26 52 38 50 50 C46 66 38 72 38 86 C38 102 48 110 60 110 C72 110 82 102 82 86 C82 72 74 66 70 50 C68 38 66 26 60 26Z" fill="url(#${id})"/>${hoja}`; break;
+    case 'plum': body=`<ellipse cx="60" cy="64" rx="36" ry="40" fill="url(#${id})"/><path d="M60 26 q4 38 0 76" stroke="${mix(base,'#000000',0.25)}" stroke-width="2" fill="none" opacity="0.4"/>`; break;
+    case 'apple': body=`<path d="M60 36 C48 30 34 38 34 58 C34 82 48 104 60 104 C72 104 86 82 86 58 C86 38 72 30 60 36Z" fill="url(#${id})"/><path d="M60 36 q0 -12 8 -16" stroke="#7A5A3A" stroke-width="3" fill="none"/>${hoja}`; break;
+    case 'avo': body=`<path d="M60 24 C48 24 44 44 48 62 C51 78 54 106 60 106 C66 106 69 78 72 62 C76 44 72 24 60 24Z" fill="url(#${id})"/>`; break;
+    case 'eggplant': body=`<path d="M74 30 C88 36 88 66 74 84 C64 98 44 100 38 84 C32 68 44 52 60 46 C68 43 70 38 68 30Z" fill="url(#${id})"/><path d="M68 30 q-4 -10 6 -12 q10 4 4 14" fill="#7E9A54"/>`; break;
+    case 'zucchini': body=`<rect x="46" y="26" width="28" height="80" rx="14" fill="url(#${id})"/><path d="M60 26 l0 -8" stroke="#7E9A54" stroke-width="3"/>`; break;
+    case 'olive': body=`<ellipse cx="60" cy="64" rx="24" ry="34" fill="url(#${id})"/>${hoja}`; break;
+    case 'seed': body=`<ellipse cx="60" cy="62" rx="14" ry="28" fill="url(#${id})"/>`; break;
+    case 'lens': body=`<ellipse cx="60" cy="64" rx="30" ry="20" fill="url(#${id})"/>`; break;
+    case 'berry': body=`<circle cx="60" cy="64" r="34" fill="url(#${id})"/><path d="M50 52 l10 10 l10 -10 l-10 -6z" fill="${mix(base,'#000000',0.3)}" opacity="0.5"/>`; break;
+    case 'rasp': body=`<g fill="url(#${id})">`+[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2],[1,3]].map(([x,y])=>`<circle cx="${46+x*14}" cy="${44+y*13}" r="8"/>`).join('')+`</g>${hoja}`; break;
+    case 'onion': body=`<path d="M60 32 C42 32 38 58 48 78 C54 90 66 90 72 78 C82 58 78 32 60 32Z" fill="url(#${id})"/><path d="M56 32 l4 -12 l4 12" stroke="#9CBE6E" stroke-width="2" fill="none"/>`; break;
+    case 'pepper': body=`<path d="M40 44 C36 74 50 96 60 96 C70 96 84 74 80 44 C72 52 48 52 40 44Z" fill="url(#${id})"/><path d="M56 44 q4 -14 8 0" stroke="#7E9A54" stroke-width="5" fill="none"/>`; break;
+    case 'corn': body=`<ellipse cx="60" cy="66" rx="20" ry="38" fill="url(#${id})"/><g fill="${mix(base,'#000000',0.2)}" opacity="0.4">`+[...Array(15)].map((_,i)=>`<circle cx="${52+(i%3)*8}" cy="${42+((i/3)|0)*9}" r="2.5"/>`).join('')+`</g><path d="M50 34 l-8 -14 M60 30 l0 -16 M70 34 l8 -14" stroke="#9CBE6E" stroke-width="3"/>`; break;
+    case 'leaf': body=`<g fill="url(#${id})"><circle cx="48" cy="56" r="16"/><circle cx="72" cy="56" r="16"/><circle cx="60" cy="46" r="16"/><circle cx="60" cy="70" r="18"/></g>`; break;
+    case 'celery': body=`<g stroke="url(#${id})" stroke-width="9" stroke-linecap="round"><path d="M50 106 L46 40"/><path d="M60 106 L60 36"/><path d="M70 106 L74 40"/></g><g fill="#9CBE6E">`+[...Array(4)].map((_,i)=>`<circle cx="${48+i*8}" cy="${34-(i%2)*5}" r="7"/>`).join('')+`</g>`; break;
+    case 'coco': body=`<circle cx="60" cy="64" r="38" fill="url(#${id})"/><circle cx="50" cy="56" r="4" fill="#3A2A1C"/><circle cx="70" cy="54" r="4" fill="#3A2A1C"/><circle cx="60" cy="68" r="4" fill="#3A2A1C"/>`; break;
+    case 'pineapple': body=`<ellipse cx="60" cy="72" rx="28" ry="34" fill="url(#${id})"/><g stroke="${mix(base,'#000000',0.25)}" stroke-width="1.5" opacity="0.4">`+[...Array(5)].map((_,i)=>`<path d="M${34+i*13} 44 L${34+i*13-6} 106"/>`).join('')+`</g><g fill="#7E9A54"><path d="M60 44 l-12 -24 l6 24 M60 40 l0 -26 M60 44 l12 -24 l-6 24"/></g>`; break;
+    case 'pumpkin': body=`<ellipse cx="60" cy="70" rx="42" ry="32" fill="url(#${id})"/><g stroke="${mix(base,'#000000',0.25)}" stroke-width="1.5" fill="none" opacity="0.4">`+[...Array(5)].map((_,i)=>`<path d="M60 42 q${(i-2)*10} 28 0 56"/>`).join('')+`</g><rect x="56" y="34" width="8" height="10" rx="2" fill="#7A5A3A"/>`; break;
+    default: body=`<ellipse cx="60" cy="64" rx="42" ry="44" fill="url(#${id})"/>${hoja}`;
+  }
+  return `<svg width="150" height="150" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs>${g}</defs>${body}</svg><div class="glow"></div>`;
+}
+function hashCode(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;}return h;}
+function mix(a,b,t){const pa=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];const pb=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];const r=pa.map((x,i)=>Math.round(x+(pb[i]-x)*t));return '#'+r.map(x=>x.toString(16).padStart(2,'0')).join('');}
+function W(){
+  if(sexo==='f')return{N:nombre,art:'la',pron:'ella',hijo:'tu hija'};
+  if(sexo==='m')return{N:nombre,art:'el',pron:'él',hijo:'tu hijo'};
+  return{N:nombre,art:'',pron:'',hijo:'tu guagua'};
+}
+function T(s){
+  let t=s;
+  if(sexo==='f') t=t.replace(/\bla guagua\b/g,'la '+nombre).replace(/\bLa guagua\b/g,nombre).replace(/\btu guagua\b/g,'tu hija').replace(/\bnuestra guagua\b/g,'nuestra hija');
+  else if(sexo==='m') t=t.replace(/\bla guagua\b/g,'el '+nombre).replace(/\bLa guagua\b/g,nombre).replace(/\btu guagua\b/g,'tu hijo').replace(/\bnuestra guagua\b/g,'nuestro hijo');
+  return t;
+}
+
+/* ====== CONTENIDO SEMANAL ====== */
+const S={
+4:{baby:"Un puñado de células que ya se reparten la pega: unas serán corazón, otras cerebro, otras piel.",body:"Vale, quizás aún no sientes nada, o un cansancio raro sin causa. Tu cuerpo está montando toda la obra en silencio.",act:"Kriss, arranca suave: pregúntale una vez al día cómo está y escúchala sin salir a arreglar nada.",care:"No tienes que tener todo resuelto, Vale. Recién parten esta historia los dos.",line:"Empezó algo. Todavía en secreto, pero empezó.",frase:"Todavía nadie sabe, Vale, pero tu cuerpo ya empezó la obra más importante de nuestras vidas.",wow:"Mide menos que un grano de arroz y ya trae escrito de qué color van a ser sus ojos."},
+5:{baby:"El corazón empieza a formarse: será el primer órgano en funcionar.",body:"Las hormonas ya trabajan a full. El sueño de media tarde no es flojera, es demanda real.",act:"Deja un vaso de agua en su velador antes de dormir. Treinta segundos que le sirven toda la noche.",care:"Duerme tú también, Vale. Descansar es parte del trabajo, no lo contrario.",line:"Un corazón se está construyendo. Antes que cualquier otra cosa.",frase:"De todo lo que va a tener, su corazón se hace primero. Como si supiera que eso es lo que más importa.",wow:"El corazón late antes de que exista el cerebro para ordenarle que lata. Arranca solo."},
+6:{baby:"El corazón ya late con ritmo propio, distinto al tuyo.",body:"Pueden empezar las náuseas: son la señal química de que todo se está afirmando bien.",act:"Kriss, ten galletas de soda a mano en la casa. Las náuseas no avisan.",care:"Si el olor a comida te marea, Vale, no es maña. Es tu cuerpo cuidando a la guagua.",line:"Hay un latido nuevo. Chico, rápido, y es nuestro.",frase:"En algún lugar dentro de ti, Vale, hay un corazón latiendo por primera vez. Y late por nosotros.",wow:"Late a unos 110 por minuto y sube cada día. Pronto irá casi al doble de rápido que el tuyo, Vale."},
+7:{baby:"Aparecen los brotes de brazos y piernas. El cerebro crece a una velocidad que no se repite jamás.",body:"El cansancio y las náuseas pueden estar en su peak. Descansar hoy es hacer pega.",act:"Kriss, hazte cargo de una comida completa. Que la Vale no tenga ni que pensar el menú.",care:"Elige una cosa y hazla bien, Vale, no diez a medias. Sostener le gana a reventarse.",line:"Le están saliendo los brazos. Literal, esta semana.",frase:"Cada día que descansas, Vale, ella crece. Nunca fue tan cierto que no hacer nada sea hacerlo todo.",wow:"Genera más de 100 mil neuronas por minuto. En lo que lees esto, ya hizo varios millones."},
+8:{baby:"Ya tiene forma reconocible de guagua. Los deditos empiezan a marcarse.",body:"Fabricar esto gasta más energía que salir a correr. Si el cuerpo te pide dormir, tiene razón.",act:"Kriss, bájale la lista de pendientes: toma tú dos cosas, sin que las pida.",care:"Vale, fabricar una vida es el trabajo más pesado que existe. Trátate con esa consideración.",line:"Del porte de una frambuesa y ya con forma de persona.",frase:"Nadie lo nota todavía, pero estás haciendo lo imposible, Vale: una persona entera, desde cero.",wow:"Ya se mueve dentro de la guata, pero es tan chico que ni se siente. Como la Fauna en el campo, que se mueve sin que la escuchemos de lejos."},
+9:{baby:"Todos los órganos base ya están esbozados. Ahora crece y se afina.",body:"El ánimo puede andar en montaña rusa. Es química, no exageración.",act:"Kriss, un abrazo largo, sin apuro ni discurso. A veces estar callado al lado vale más que cualquier consejo.",care:"Vale, tu mal genio de hoy no es contra nadie. Es tu cuerpo trabajando. Perdónate esos ratos.",line:"Deja de ser embrión esta semana. Ascenso oficial a feto.",frase:"En los días difíciles, Vale, acuérdate: no estás fallando, estás creando. No es lo mismo.",wow:"Mide unos 2 cm y ya tiene lóbulos de oreja y punta de nariz."},
+10:{baby:"Cierra la fábrica de órganos nuevos. De aquí en adelante, crecer y madurar.",body:"La ropa puede empezar a apretar aunque no se note la guata. Es normal.",act:"Kriss, si algo le aprieta, anótalo y consíguele algo cómodo esta semana.",care:"Vale, no compares esto con ningún otro embarazo ni con lo que sale en el teléfono. El tuyo es único.",line:"Se acabó lo más delicado. Ahora es puro crecer.",frase:"Pasamos la parte más frágil, Vale. Cada semana que viene es más nuestra guagua y menos incertidumbre.",wow:"Los intestinos venían creciendo dentro del cordón umbilical y esta semana recién se meten a la guata."},
+11:{baby:"Crece rapidísimo. Los huesos empiezan a endurecerse y los dedos ya están separados, con lechos de uña.",body:"Vale, estás en las últimas dos semanas del primer trimestre. Lo más pesado empieza a ceder.",act:"Kriss, confirma la eco de las 11 a 14 semanas y anda con ella. Verla moverse en la pantalla es de los dos.",care:"Vale, emociónate y que se note. No tienes que hacerte la fuerte: esto también es para disfrutarlo.",line:"Ya abre y cierra las manos. Todavía sin que lo sientas.",frase:"Falta poquito para verla en la pantalla, Vale. Nuestra primera cita con la guagua, los tres juntos.",wow:"Ya traga líquido amniótico y sus riñones lo devuelven como pipí. Se recicla varias veces al día."},
+12:{baby:"Aparecen los reflejos: si le tocaran la palma, la cerraría.",body:"Muchas mujeres sienten que las náuseas aflojan por aquí. Ojalá te toque el respiro, Vale.",act:"Kriss, celebren el cierre del primer trimestre con algo rico. Se lo ganaron los dos.",care:"Vale, ya pasó lo más difícil. Date crédito por haber llegado hasta acá cuidándola tan bien.",line:"Ya tiene huellas dactilares. Únicas, para siempre.",frase:"Ya tiene huellas propias, Vale. No hay ni habrá otra guagua igual a la nuestra en todo el mundo.",wow:"Sus huellas ya están formadas y no las tiene nadie más igual. Ni Ragnar con sus patitas la iguala en originalidad."},
+13:{baby:"Arranca el segundo trimestre. Ya tiene cuerdas vocales y la cara cada vez más definida.",body:"Suele llegar más energía en esta etapa. Aprovéchala, Vale, sin exigirte de más.",act:"Kriss, propón una caminata suave por la orilla de la laguna de Aculeo. Aire, sol y calma para los tres.",care:"Vale, si te vuelve la energía, súbete al envión, pero guárdate un poco para ti.",line:"Bienvenido el trimestre que casi todas prefieren.",frase:"Dicen que este es el trimestre más lindo, Vale. Con Aculeo de fondo, no me cuesta creerlo.",wow:"Puede llevarse el pulgar a la boca y ensayar la succión, entrenando para cuando tenga que mamar."},
+14:{baby:"Ya hace muecas: frunce el ceño, arruga la cara. Está ensayando gestos.",body:"La guata empieza a asomar de verdad.",act:"Kriss, sácale una foto al perfil de la pancita. Un minuto hoy, recuerdo para siempre.",care:"Vale, mírate al espejo sin juzgarte. Tu cuerpo cambiando es la cosa más increíble que va a hacer nunca.",line:"Del porte de una naranja y haciendo caras.",frase:"Tu pancita ya empieza a contar la historia, Vale. Y es la historia más linda que hemos escrito.",wow:"Ya mueve los ojos bajo los párpados cerrados y puede tener hipo, aunque nadie lo note aún."},
+15:{baby:"Percibe la luz a través de la piel, con los ojos todavía cerrados. Empieza a captar los primeros sonidos.",body:"Vale, puede que te sientas más tú misma otra vez.",act:"Kriss, pon música suave contra la guata y quédate ahí un rato con la Vale. Un atardecer en Aculeo es perfecto.",care:"Vale, ese rato tranquilo también te recarga a ti. Es de los mejores del día, no lo saltes.",line:"Ya nota si hay luz afuera. Sin abrir los ojos.",frase:"Todavía no ve, pero ya sabe si es de día. Poco a poco, Vale, nuestra guagua va conociendo el mundo desde adentro.",wow:"Si le acercan una linterna a la guata, se aleja de la luz. Ya tiene opinión sobre lo que le molesta."},
+16:{baby:"Los huesitos del oído se acomodan: pronto va a oírnos de verdad.",body:"Podrían venir los primeros movimientos, como burbujitas. Fáciles de confundir con otra cosa.",act:"Kriss, cuando la Vale diga que sintió algo, deja todo y ponle la mano.",care:"Vale, no te achaques si aún no lo sientes claro. Tu turno llega, dale tiempo al cuerpo.",line:"Del porte de una palta, afinando el oído.",frase:"Esas burbujitas que sientes, Vale, son sus primeras pataditas diciéndote hola. Yo espero mi turno de sentirlas.",wow:"Su corazón bombea cerca de 24 litros de sangre al día, con vasos del grosor de un pelo."},
+17:{baby:"Empieza a acumular grasa bajo la piel: energía y calor para más adelante.",body:"El equilibrio te cambia con el peso nuevo. Ojo al pararte rápido, Vale.",act:"Kriss, dale la mano al levantarse del sillón o la cama. Gesto chico, ayuda real.",care:"Vale, pídeme ayuda sin culpa. No es debilidad: es que somos dos en esto.",line:"Empieza a agarrar peso de verdad.",frase:"De a poco pesa más, Vale, y cada gramo suyo es una buena noticia. Está creciendo sana, gracias a ti.",wow:"Ya tiene su propio patrón de huellas también en los pies. Y su corazón no descansa nunca, ni cuando duerme."},
+18:{baby:"Sus oídos ya están formados y empieza a captar los sonidos de adentro: sobre todo tu corazón, latiendo todo el día.",body:"Puede aparecer dolor de espalda: el centro de gravedad se te corrió hacia adelante.",act:"Kriss, empieza a hablarle a la guata aunque sea temprano. En unas semanas te va a escuchar clarito.",care:"Vale, si te duele la espalda, no lo aguantes callada. Dilo y apóyate en mí.",line:"Ya escucha por dentro: tu corazón es su primer sonido.",frase:"Lo primero que va a conocer de este mundo, Vale, es el sonido de tu corazón. No se me ocurre mejor bienvenida.",wow:"Lo primero que oye no es una voz: es el latido de tu corazón, como un tambor constante de fondo."},
+19:{baby:"Se forma el vérnix, una capa cremosa que le protege la piel como un impermeable.",body:"Puntadas en la pelvis al moverte rápido: son los ligamentos estirándose para dar espacio.",act:"Kriss, ofrécele un masaje corto en la espalda baja al final del día. Cinco minutos alcanzan.",care:"Vale, vamos justo por la mitad. Frena y date cuenta de lo lejos que has llegado.",line:"Vamos justo por la mitad del camino.",frase:"Mitad del camino, Vale. Lo que empezó como un secreto ya es una personita que nos está esperando.",wow:"Lo cubre una capa blanca cremosa que lo protege del líquido, la misma con que nacen los recién nacidos."},
+20:{baby:"Mitad de camino. Los movimientos ya son claros y frecuentes.",body:"La espalda carga más. Las molestias son reales: no dejes que nadie te las minimice, Vale.",act:"Kriss, ármale un rincón para descansar con las piernas en alto. Un par de cojines y listo.",care:"Vale, la semana 20 es un logro enorme. Estás a la mitad de algo gigante, y lo estás haciendo increíble.",line:"Semana 20. La mitad exacta.",frase:"Veinte semanas, Vale. La mitad del camino y el doble de amor. En la eco quizás ya sepamos si es él o ella.",wow:"En la eco de esta etapa ya se puede ver si es niño o niña. El momento de ponerle nombre de verdad se acerca."},
+21:{baby:"Ya tiene ciclos de sueño y de vigilia. A veces despierta justo cuando quieres dormir.",body:"El apetito puede volver con fuerza. Antojos incluidos, Vale.",act:"Kriss, ten una colación rica a mano para la noche. Un frasco preparado, sin que lo pida.",care:"Vale, los antojos no son capricho. Si el cuerpo lo pide, escúchalo sin culpa.",line:"Ya duerme y despierta con su propio horario.",frase:"Ya tiene sus horarios, Vale. Aunque no siempre coincidan con los tuyos... eso ya es entrenar para lo que viene.",wow:"Puede tener hipo dentro de la guata: lo vas a sentir como golpecitos rítmicos, un tic-tac chiquito."},
+22:{baby:"La carita ya está casi lista: cejas, pestañas y rasgos propios.",body:"La piel de la guata se estira y pica. Crema y paciencia.",act:"Kriss, ofrécete a ponerle crema en la guata. Es más rato de conexión que tarea.",care:"Vale, esos ratos de crema y caricias también son para ti. Disfruta que la mimen.",line:"Ya tiene cara. Falta ver a quién se parece.",frase:"Ya tiene carita, Vale. Me paso horas imaginando a quién se va a parecer. Ojalá tenga tu sonrisa.",wow:"Ya percibe cuando caminas o te meces: el movimiento la arrulla, igual que a una guagua en brazos."},
+23:{baby:"Este es el gran hito: ya empieza a oír los sonidos de AFUERA, no solo los tuyos. La voz de Kriss, grave, es de las que mejor le llegan.",body:"Los tobillos pueden hincharse al atardecer. Levantar las piernas ayuda de verdad.",act:"Vale, dile a Kriss que le hable a la guata en serio. Desde esta semana su voz cruza y la guagua la va guardando.",care:"Vale, bájale el ritmo al atardecer. No todo en la vida es estar haciendo algo.",line:"Desde esta semana te escucha a ti, y también a Kriss desde afuera.",frase:"Ahora sí me escucha, Vale. Le voy a hablar todas las noches para que, cuando nazca, ya sepa quién es su papá.",wow:"Recién ahora la voz de afuera le llega de verdad. La de Kriss, por grave, cruza la barrera mejor que una aguda."},
+24:{baby:"Sus pulmones empiezan a prepararse para el aire. Hito importante.",body:"Es la etapa del test de tolerancia a la glucosa. Molesto pero necesario, Vale.",act:"Kriss, acompáñala al examen de glucosa si puedes. De a dos el trámite pesa menos.",care:"Vale, un examen no te define. Vayas como vayas, lo estás haciendo bien.",line:"Cruzó el umbral: ya sería viable con ayuda médica.",frase:"Cada examen que pasamos, Vale, es una tranquilidad más. Gracias por cuidar a los dos con tanto amor.",wow:"Desde este peso, si naciera antes ya tendría chances reales con apoyo médico. Un límite enorme se cruza esta semana."},
+25:{baby:"Responde a las voces y al tacto. Si le hablas, a veces se mueve.",body:"El pelo puede verse más lindo: un regalito hormonal de la etapa.",act:"Kriss, dile algo a la guata y espera callado. A veces contesta con una patada.",care:"Vale, párate a disfrutar estos momentos. Son los que vas a recordar toda la vida.",line:"Le hablas y te contesta. Ya nos conoce.",frase:"Le hablo y me responde con una pataadita, Vale. Todavía no nace y ya tenemos nuestras conversaciones.",wow:"Reconoce voces que escucha seguido y las recuerda después de nacer. Si le hablamos ahora, al nacer nos reconoce."},
+26:{baby:"Abre los ojos por primera vez. Todavía distingue solo luz y sombra.",body:"Dormir te cuesta más: encontrar postura cómoda se vuelve misión nocturna.",act:"Kriss, ármale la fortaleza de cojines para dormir de lado. Uno entre las rodillas hace magia.",care:"Vale, si duermes mal, una siesta de día no es lujo, es necesidad. Tómala.",line:"Abrió los ojos. Esta semana, por primera vez.",frase:"Abrió los ojitos, Vale. Pienso en el día que los abra afuera y nos vea por primera vez. No lo aguanto.",wow:"Ya parpadea, aunque adentro haya poco que mirar. La Pascualita, viejita, parpadea menos que nuestra guagua ahora."},
+27:{baby:"Cierra el segundo trimestre con el cerebro a full y el sueño más ordenado.",body:"Puede venir acidez: la progesterona relaja todo. Comidas chicas y seguidas ayudan.",act:"Kriss, ten algo para la acidez a mano y eviten cenas muy pesadas juntos.",care:"Vale, dos trimestres cargando a la guagua ya es un montón. Vas increíble, aunque nadie te lo diga.",line:"Dos trimestres listos. Queda el último.",frase:"Dos tercios del camino, Vale. Lo que viene es la recta final para conocer a la personita que hicimos.",wow:"Ya hace movimientos de respiración de práctica, ensayando respirar meses antes de tener aire."},
+28:{baby:"Recta final. Oye claro y reconoce las voces de siempre: la tuya y la de Kriss.",body:"El útero te empuja el diafragma y puede faltarte el aire. El esfuerzo por respirar es real.",act:"Kriss, no la apures nunca al caminar. Acomódate tú a su ritmo, no al revés.",care:"Vale, empieza la parte más pesada. Dosifícate: guarda energía para lo que viene.",line:"Tercer trimestre. Ya se ve la meta.",frase:"Tercer trimestre, Vale. La recta final. Ya casi tenemos a la guagua en brazos, tú y yo, en casa.",wow:"Desde ahora memoriza melodías y entonaciones. Si le ponen siempre la misma canción, al nacer se calma con ella."},
+29:{baby:"Músculos y pulmones siguen madurando. Cada día está más listo.",body:"Vuelve el cansancio. El peso extra se nota en cada movimiento.",act:"Kriss, encárgate de lo pesado de la casa esta semana. Que la Vale no cargue nada.",care:"Vale, repartir la carga no es debilidad. Pide ayuda a quien haga falta.",line:"Cada día que pasa, más armado para el mundo.",frase:"Sé que estás cansada, Vale. Apóyate en mí todo lo que necesites. Para eso estoy, para todo.",wow:"Ya puede regular en parte su propia temperatura. Empieza a hacer su propio calor, como un animalito armando su abrigo."},
+30:{baby:"Acumula grasa para regular su temperatura al nacer. Se pone más redondito.",body:"Pueden venir contracciones de práctica (Braxton Hicks). Son ensayos, no alarma.",act:"Kriss, cuando venga una contracción de práctica, respiren juntos. Marca tú el ritmo, con calma.",care:"Vale, aprender a respirar juntos ahora te va a servir el día del parto. Es práctica de verdad.",line:"Practicando para el día grande, los dos.",frase:"Ya falta poco, Vale. Me imagino su carita a cada rato y no me la puedo sacar de la cabeza.",wow:"El cerebro se le arruga y pliega para meter más neuronas en el mismo espacio. Pasa de liso a tener todos sus surcos."},
+31:{baby:"Los cinco sentidos ya funcionan: oye, ve luz, saborea, siente y huele.",body:"El sueño se corta. Las siestas de día valen y se recomiendan.",act:"Kriss, protégele las siestas: silencio, cortina cerrada, celular en mudo y a Aki lejos de la pieza.",care:"Vale, una siesta no es flojera, es batería. Duerme cuando puedas, sin culpa.",line:"Todos los sentidos, encendidos.",frase:"Ya percibe casi todo, Vale. Quiero llenar sus últimas semanas adentro de voces suaves y buena vibra.",wow:"Saborea el líquido y le cambia el gusto según lo que comes. Lo que comes hoy, marca lo que le va a gustar mañana."},
+32:{baby:"Casi siempre en posición de nacer: cabeza abajo, listo.",body:"El aire te cuesta y el cuerpo te pesa. Cada respiración larga es un logro.",act:"Kriss, antes de dormir hazle un masaje de pantorrillas para prevenir los calambres.",care:"Vale, no cargues con la ansiedad de los dos. Comparte conmigo lo que te preocupa.",line:"Ya se dio vuelta. Cabeza abajo, en posición.",frase:"Ya se puso en posición para conocernos, Vale. Estoy nervioso y feliz como nunca en mi vida.",wow:"Sus uñas ya llegan a la punta de los dedos. Puede nacer con ellas largas y hasta rasguñarse solo."},
+33:{baby:"Recibe tus anticuerpos: defensas para sus primeros meses de vida.",body:"La pelvis se te afloja (relaxina). Puede molestarte al caminar. No estás torpe: te reconfiguras.",act:"Kriss, dale el brazo en escaleras y pisos resbalosos. Su equilibrio cambió.",care:"Vale, verte que te cuesta moverte y no poder evitarlo me pesa a mí también. No estás sola.",line:"Le estás pasando tus defensas. Literalmente.",frase:"Tu cuerpo le está regalando defensas para toda la vida, Vale. Eres increíble, aunque a veces no lo notes.",wow:"Tus anticuerpos cruzan la placenta y la protegen meses después de nacer. Le pasas un escudo hasta que arme el propio."},
+34:{baby:"Los pulmones ya casi listos. Naciendo ahora, muy buenas chances.",body:"Buen momento para armar el bolso de la clínica.",act:"Kriss, armen el bolso juntos con lista en mano. Repartir hace que no recaiga todo en uno.",care:"Vale, tener todo listo baja la ansiedad de los dos. Háganlo con tiempo y calma.",line:"Pulmones casi al día. Falta poco.",frase:"Ya estamos preparando todo para recibirla, Vale. Cada cosa que guardamos en el bolso me emociona un poco más.",wow:"Empieza a producir surfactante, una especie de jabón que evita que los pulmones se peguen al respirar."},
+35:{baby:"Sube de peso rápido. Ya casi no le queda espacio: se mueve distinto.",body:"Todo cuesta: dormir, moverse, respirar. Es el tramo más exigente, Vale.",act:"Kriss, anticípate a lo básico sin que lo pida: agua, cojín, un pie en alto. Ya le conoces las mañas.",care:"Vale, estás cansada y es válido. Cansada no es lo mismo que fallar. Lo estás logrando.",line:"Apretadito. Casi sin cancha para moverse.",frase:"Ya casi, Vale. Lo que has cargado estos meses no lo carga cualquiera. Estoy tan orgulloso de ti.",wow:"Es la etapa del cultivo de estreptococo B. Y ya ocupa casi toda la guata: las patadas ahora se sienten como codazos."},
+36:{baby:"Baja hacia la pelvis y se encaja. Ya casi a término.",body:"Puede que respires mejor cuando encaje, pero con más presión abajo.",act:"Kriss, auto con bencina, ruta a la clínica clara, teléfono cargado. Deja el modo listo armado.",care:"Vale, tener el plan claro te deja dormir más tranquila. No es exagerar, es cuidarse.",line:"Se está encajando. La señal de que se acerca.",frase:"Falta tan poco para tenerla en brazos, Vale, que me cuesta dormir de la emoción.",wow:"Desde la semana 37 ya se considera de término: puede nacer cuando quiera. La cuenta regresiva es de verdad ahora."},
+37:{baby:"Término temprano. Prácticamente lista. Solo termina de engordar.",body:"Cualquier día puede ser el día. Guarda energía, Vale.",act:"Kriss, bolso en la puerta y teléfono siempre cargado. En guardia, pero tranquilo.",care:"Vale, no te desveles esperando. Guarda fuerzas para el día grande, que lo vas a necesitar.",line:"Ya puede llegar cuando decida.",frase:"Ya puede llegar cuando quiera, Vale. Estoy listo para lo más importante que voy a hacer: ser su papá y tu compañero.",wow:"Solo el 4% de las guaguas nace en la fecha exacta calculada. Es un rango, no un plazo fijo."},
+38:{baby:"Últimos ajustes de pulmones y cerebro.",body:"La fecha de parto es un rango, no algo exacto. La calma es tu mejor aliada, Vale.",act:"Kriss, filtra los '¿ya nació?' de la familia. Sé tú el parachoques para que a la Vale no la agobien.",care:"Vale, ese '¿ya?' constante también cansa. Puedes silenciar el teléfono un rato, está permitido.",line:"El día llega solo. Sin apuro.",frase:"No importa el día exacto, Vale. Nuestra guagua sabe cuándo llegar, y nosotros vamos a estar listos.",wow:"Dos semanas antes o después de la fecha es completamente normal. Ella sabe cuándo, aunque el calendario diga otra cosa."},
+39:{baby:"Término pleno. Formada del todo, esperando el momento.",body:"Puede haber señales de que el parto se acerca. Conócelas, sin obsesionarte.",act:"Kriss, repasen juntos las señales de parto y cuándo partir. Sé su calma cuando llegue el momento.",care:"Vale, saber qué hacer te quita miedo. Repasarlo juntos es cuidarse los dos.",line:"Lista. Solo falta que elija el momento.",frase:"Ya está lista, Vale. Y yo también, contigo. Lo que viene lo vamos a vivir juntos, de la mano.",wow:"Ya tiene grasa suficiente para mantener su temperatura afuera. Viene con su propio abrigo de fábrica."},
+40:{baby:"Completó el camino. Ahora espera el momento justo para salir a conocernos.",body:"Vale, completaste una de las mayores demandas que vive un cuerpo humano.",act:"Kriss, consiéntela hoy y descansa tú: lo que viene los necesita a los dos enteros.",care:"Vale, llegaron juntos hasta acá. Lo hiciste extraordinario. Ahora, a lo mejor de todo.",line:"Llegaste al final del camino. Y al principio de todo.",frase:"Lo lograste, Vale. Hiciste una vida entera dentro de ti. En Aculeo, con la Fauna, Ragnar, la Pascualita y Aki, hay una casa entera esperándola. Gracias por hacerme papá.",wow:"Tu cuerpo dispara solo la cascada hormonal que arranca el parto. Nadie aprieta el botón: el cuerpo sabe cuándo."}
+};
+
+/* ====== ALERTAS: normal vs llamar al doctor, por trimestre ====== */
+function alertas(sem){
+  if(sem<=13) return {
+    ok:["Náuseas y vómitos, sobre todo en la mañana","Cansancio fuerte y ganas de dormir a toda hora","Pechos sensibles e hinchados","Ir mucho al baño","Manchado leve muy ocasional al limpiarse","Cambios de ánimo y sensibilidad","Rechazo o antojo por ciertos olores y comidas"],
+    warn:["Sangrado rojo abundante, como una regla o más","Dolor fuerte y sostenido en la parte baja de la guata o a un lado","Vómitos tan seguidos que no retiene ni el agua","Fiebre sobre 38°C","Ardor o dolor fuerte al orinar","Desmayo o mareo que no pasa al recostarse"]
+  };
+  if(sem<=27) return {
+    ok:["Puntadas o tirones a los lados de la guata (ligamentos)","Primeros movimientos suaves, tipo burbujas","Dolor de espalda baja","Encías que sangran un poco al lavarse los dientes","Congestión nasal sin resfrío","Antojos y más apetito","Algo de acidez o reflujo"],
+    warn:["Sangrado vaginal de cualquier tipo","Pérdida de líquido por la vagina (chorro o goteo constante)","Dolor de cabeza fuerte que no cede con nada","Ver lucecitas, manchas o visión borrosa","Hinchazón brusca de cara y manos","Dolor fuerte arriba de la guata, bajo las costillas","Contracciones seguidas y dolorosas antes de tiempo"]
+  };
+  return {
+    ok:["Contracciones de práctica (Braxton Hicks): irregulares y sin dolor fuerte","Falta de aire al caminar o subir escaleras","Pies y tobillos algo hinchados al final del día","Necesidad de orinar muy seguido","Insomnio y dificultad para acomodarse","Presión hacia abajo cuando la guagua se encaja","Calostro: gotitas del pecho"],
+    warn:["Menos movimientos de lo habitual o que deje de moverse","Contracciones regulares, seguidas y dolorosas antes de la semana 37","Romper aguas (chorro o goteo que no para)","Sangrado vaginal","Dolor de cabeza intenso, visión borrosa o ver lucecitas","Hinchazón repentina y marcada de cara y manos","Fiebre sobre 38°C"]
+  };
+}
+const ALERT_NOTE="Ante la duda, siempre es mejor llamar y preguntar. Nadie conoce tu cuerpo mejor que tú, Vale. Esta guía no reemplaza a tu matrona ni a tu doctor.";
+
+/* ====== RASGOS: ¿cómo será? (con base genética real) ====== */
+function diaAnoW(){return Math.floor((hoy0()-new Date(hoy0().getFullYear(),0,0))/86400000);}
+const DATOS_DIA=[
+  "El útero de la Vale, que normalmente pesa como una pera, al final del embarazo pesará casi un kilo.",
+  "La guagua flota en líquido que se renueva por completo varias veces al día.",
+  "El cordón umbilical mide al final unos 50 cm, casi lo mismo que la guagua.",
+  "La placenta es un órgano nuevo que el cuerpo de la Vale creó de cero solo para este embarazo.",
+  "Las guaguas lloran sin lágrimas las primeras semanas de vida; recién aparecen al mes o dos.",
+  "El corazón de la guagua es del porte de un puñito... el suyo, chiquitito.",
+  "Al nacer, reconocerá el olor de la Vale entre muchos otros. Ya lo está aprendiendo.",
+  "La guagua puede bostezar dentro de la guata. Se ve en las ecos.",
+  "El sentido del gusto se forma antes que la vista funcione del todo.",
+  "Cada guagua nace con unos 300 huesos; de adulto quedan 206 porque varios se fusionan.",
+  "La Vale respira por dos: su consumo de oxígeno sube cerca de un 20% en el embarazo.",
+  "La guagua duerme la mayor parte del día, pero rara vez cuando la Vale quiere dormir.",
+  "Los recién nacidos ven mejor a unos 25-30 cm: justo la distancia a la cara de quien los toma en brazos.",
+  "La guata de la Vale le sirve de caja de resonancia: la guagua siente su voz vibrar, no solo la oye."
+];
+const RASGOS=[
+  {ico:"👁️",t:"¿De qué color los ojos?",p:"Casi todas las guaguas nacen con ojos azul-grisáceos. El color definitivo aparece de a poco: se asienta cerca de los 6 meses y puede cambiar hasta los 3 años. Todo depende de cuánta melanina hereden de ustedes."},
+  {ico:"💇",t:"¿Tendrá rulitos?",p:"El pelo rizado le gana al liso: es un rasgo dominante. Si en la familia hay rulos, hay buenas chances de que aparezcan. Si los dos tienen pelo liso, lo más probable es que salga lisa."},
+  {ico:"🎨",t:"¿Rubia, castaña o morena?",p:"El color de pelo lo definen varios genes mezclados, no uno solo. Muchas guaguas nacen más claras y se les oscurece con los años. Puede salir con un tono que no tiene ninguno de los dos, si viene de más atrás en la familia."},
+  {ico:"👃",t:"¿A quién se va a parecer?",p:"La nariz, el mentón, los hoyuelos, la forma de la sonrisa... todo eso es una mezcla al azar de los dos. Por eso ninguna guagua es igual a otra, ni siquiera entre hermanos."},
+  {ico:"🧬",t:"Ya está todo escrito",p:"Aunque no se note, desde el primer día quedaron definidos su color de ojos, de pelo, su estatura probable y hasta si tendrá hoyuelos. Solo falta que crezca para que se revele."},
+  {ico:"❤️",t:"Lo que no está en los genes",p:"Su risa, sus mañas, lo que le va a gustar... eso lo van a construir juntos, día a día, en Aculeo. Esa parte no viene escrita: la escriben ustedes."},
+  {ico:"😊",t:"¿Tendrá hoyuelos?",p:"Los hoyuelos en las mejillas son un rasgo dominante: si uno de ustedes los tiene, hay buenas chances. Aparecen porque un musculito de la cara es un poco más corto. Pura genética simpática."},
+  {ico:"📏",t:"¿Será alta o bajita?",p:"Su estatura de adulta se puede estimar con la de ustedes dos: es más o menos el promedio de ambos, ajustado según si es niña o niño. Pero la nutrición y el descanso también juegan su parte."},
+  {ico:"🦶",t:"¿Pies grandes?",p:"El tamaño de pies y manos también se hereda, y suele ir de la mano con la estatura. A esta altura sus pies ya se están formando con sus deditos completos."},
+  {ico:"🍬",t:"¿Le gustará lo dulce?",p:"Las papilas del gusto se forman temprano, y lo que come la Vale tiñe el líquido amniótico. La guagua ya va probando sabores: en parte, ustedes le van armando el paladar desde ahora."},
+  {ico:"🌀",t:"¿Zurda o diestra?",p:"Ya se le nota una mano preferida en las ecos: muchas guaguas se chupan un pulgar en particular, y eso a veces predice si serán zurdas o diestras. Curioso, ¿no?"},
+  {ico:"👂",t:"¿Se parecerá en la voz?",p:"El timbre de voz también tiene algo de herencia, por la forma de las cuerdas y la cara. Y como ya escucha desde adentro, cuando nazca va a reconocer las voces de ustedes al tiro."}
+];
+
+/* ====== EXÁMENES E HITOS ====== */
+const EXAMENES=[
+  {w:'6-10',t:'Primera eco (confirmación)',lo:6,hi:10},
+  {w:'8-12',t:'Exámenes de sangre de ingreso',lo:8,hi:12},
+  {w:'11-14',t:'Eco Doppler + translucencia nucal',lo:11,hi:13},
+  {w:'20-24',t:'Eco morfológica (anatomía)',lo:20,hi:24},
+  {w:'24-28',t:'Test de tolerancia a la glucosa',lo:24,hi:28},
+  {w:'28-36',t:'Vacuna dTpa (tos ferina)',lo:28,hi:36},
+  {w:'32-34',t:'Eco de crecimiento',lo:32,hi:34},
+  {w:'35-37',t:'Cultivo estreptococo grupo B',lo:35,hi:37}
+];
+const HITOS=[
+  {w:6,t:'Empieza a latir el corazón'},{w:10,t:'Se acaban de formar los órganos'},
+  {w:12,t:'Tiene huellas dactilares'},{w:16,t:'Primeros movimientos'},
+  {w:18,t:'Empieza a oír por dentro'},{w:23,t:'Ya escucha voces de afuera'},
+  {w:26,t:'Abre los ojos'},{w:28,t:'Reconoce nuestras voces'},
+  {w:32,t:'Se pone cabeza abajo'},{w:37,t:'Lista para nacer'}
+];
+function hitoActual(sem){
+  if(sem>=11&&sem<=13)return{tag:'Ventana activa',title:'Eco de las 11 a 14 semanas',
+    desc:'Están justo en la ventana. Mide la translucencia nucal, revisa el hueso nasal y el flujo del ductus venoso para estimar riesgos temprano, y con el Doppler de las arterias uterinas calcula el riesgo de preeclampsia.',
+    list:['Es el mejor momento para verla moverse en pantalla','Pregunten por la translucencia nucal y el hueso nasal','Consulten el riesgo de preeclampsia (Doppler uterino)']};
+  if(sem>=20&&sem<=24)return{tag:'Ventana activa',title:'Eco morfológica',
+    desc:'La eco más detallada de todas: revisa la anatomía órgano por órgano. Suele confirmarse el sexo.',
+    list:['Revisan corazón, cerebro, riñones y columna','Miden el cuello del útero','Acá se confirma si es niño o niña']};
+  if(sem>=24&&sem<=28)return{tag:'Ventana activa',title:'Test de tolerancia a la glucosa',
+    desc:'Detecta diabetes gestacional. Se toma en ayunas, se bebe una carga de glucosa y se mide la respuesta.',
+    list:['Ir en ayunas','Acompañarla lo hace más liviano','Molesto pero rápido e importante']};
+  if(sem>=35&&sem<=37)return{tag:'Ventana activa',title:'Cultivo estreptococo grupo B',
+    desc:'Un hisopado simple para detectar una bacteria común. Si sale positivo, se dan antibióticos en el parto.',
+    list:['Examen simple e indoloro','Previene una infección al nacer','Última prueba antes de la recta final']};
+  const prox=EXAMENES.find(e=>e.lo>sem);
+  if(prox)return{tag:'Lo que viene',title:prox.t,
+    desc:`El próximo hito es alrededor de la semana ${prox.w}, cerca del ${fmtLargo(fechaDeSemana(prox.lo))}. Hay tiempo, pero conviene tenerlo en el radar.`,
+    list:['Anótenlo en el calendario','Pregunten en el próximo control','Sin apuro por ahora']};
+  return{tag:'Recta final',title:'Controles semanales',
+    desc:'En esta etapa los controles pasan a ser cada semana para vigilar de cerca. Ya casi.',
+    list:['Control cada 7 días','Bolso listo','Atentos a las señales de parto']};
+}
+
+/* ====== ALERTAS UI ====== */
+function setAlert(m){
+  alertMode=m;
+  document.getElementById('tab-ok').classList.toggle('on',m==='ok');
+  document.getElementById('tab-warn').classList.toggle('on',m==='warn');
+  const sem=Math.floor(dias()/7);
+  const a=alertas(sem);
+  const lista=m==='ok'?a.ok:a.warn;
+  const cls=m==='ok'?'ok':'warn';
+  const icon=m==='ok'?'✓':'!';
+  document.getElementById('alert-list').innerHTML=lista.map(x=>`<div class="item ${cls}"><span class="d">${icon}</span><span>${x}</span></div>`).join('');
+  document.getElementById('alert-note').textContent = m==='warn'? ALERT_NOTE : '';
+}
+
+/* ====== RENDER ====== */
+function render(){
+  const d=dias(), sem=Math.floor(d/7), ex=d%7, c=Math.max(4,Math.min(40,sem)), w=W();
+
+  // fecha
+  const h=hoy0();
+  document.getElementById('fecha').textContent=`${DIAS[h.getDay()]} ${h.getDate()} de ${MESES[h.getMonth()]}`;
+
+  // mini calendario: 3 días antes y 3 después, hoy marcado
+  let mc='';
+  for(let off=-3;off<=3;off++){
+    const f=new Date(h); f.setDate(f.getDate()+off);
+    const es=off===0?' hoy':'';
+    mc+=`<div class="d${es}"><div class="dl">${DIA_C[f.getDay()]}</div><div class="dn">${f.getDate()}</div></div>`;
+  }
+  document.getElementById('minical').innerHTML=mc;
+
+  // hero
+  document.getElementById('wk-num').textContent=sem;
+  document.getElementById('wk-lbl').textContent=`semanas + ${ex} ${ex===1?'día':'días'}`;
+  const proxSem=sem+1, fProx=fechaDeSemana(proxSem), fpp=fechaDeSemana(40);
+  document.getElementById('wk-fechas').innerHTML=`Día ${d} de 280 · faltan ${280-d}<br>El ${fmtCorto(fProx)} cumples ${proxSem} semanas · Parto: <b>${fmtLargo(fpp)}</b>`;
+  const pct=Math.max(0,Math.min(100,d/280*100));
+  document.getElementById('prog').style.width=pct.toFixed(1)+'%';
+  const tri=sem<=12?'primer':sem<=27?'segundo':'tercer';
+  document.getElementById('prog-lbl').textContent=`${pct.toFixed(0)}% · ${tri} trimestre`;
+
+  // latido
+  const hr=HR[c]||'145';
+  document.getElementById('bpm').textContent = hr==='—'? '♥' : hr+' lpm';
+
+  // fruta 3D protagonista
+  const frD=FRUTAS[c]||["semilla","una"];
+  document.getElementById('size-cap').textContent='del tamaño de '+frD[1];
+  document.getElementById('size-name').textContent=frD[0];
+  document.getElementById('size-nota').textContent=frD[2]||'';
+  document.getElementById('fruta3d').innerHTML=svgFruta(frD[0]);
+  const b=BIO[c]||[.1,.5];
+  document.getElementById('st-len').textContent=b[0]<1?Math.round(b[0]*10)+' mm':coma(b[0])+' cm';
+  document.getElementById('st-len-lbl').textContent = sem<20?'largo (cabeza a cola)':'largo (cabeza a pies)';
+  document.getElementById('st-wt').textContent=b[1]<1000?Math.round(b[1])+' g':coma((b[1]/1000).toFixed(1))+' kg';
+  document.getElementById('st-hr').textContent = hr==='—'?'♥':hr;
+
+  // contenido
+  const cont=S[c]||S[11];
+  document.getElementById('frase-txt').textContent=T(cont.frase);
+  document.getElementById('wow').textContent=T(cont.wow);
+  // dato curioso extra que rota cada día (además del de la semana)
+  document.getElementById('dato-dia').textContent=DATOS_DIA[diaAnoW()%DATOS_DIA.length];
+  document.getElementById('b-baby-t').textContent=w.N+' ahora';
+  document.getElementById('b-baby').textContent=T(cont.baby);
+  document.getElementById('b-body').textContent=T(cont.body);
+  document.getElementById('b-act').textContent=T(cont.act);
+  document.getElementById('b-care').textContent=T(cont.care);
+
+  // TÍTULO: solo el span del bebé cambia, Vale y Kriss quedan fijos (bug arreglado)
+  document.getElementById('marca-bebe').innerHTML='&amp; '+w.N;
+
+  // alertas
+  setAlert(alertMode);
+
+  // rasgos
+  // rasgos: 3 por día, rotando (cambia cada día)
+  const diaAno=Math.floor((hoy0()-new Date(hoy0().getFullYear(),0,0))/86400000);
+  const rSel=[]; for(let i=0;i<3;i++){ rSel.push(RASGOS[(diaAno+i)%RASGOS.length]); }
+  document.getElementById('rasgos').innerHTML=rSel.map(r=>
+    `<div class="rasgo"><div class="ico">${r.ico}</div><div class="cont"><h4>${T(r.t)}</h4><p>${T(r.p)}</p></div></div>`).join('');
+
+  // hito clínico + timelines
+  const hi=hitoActual(sem);
+  document.getElementById('ms-tag').textContent=hi.tag;
+  document.getElementById('ms-title').textContent=hi.title;
+  document.getElementById('ms-desc').textContent=hi.desc;
+  document.getElementById('ms-list').innerHTML=hi.list.map(x=>`<li><span class="dot">›</span>${x}</li>`).join('');
+  document.getElementById('timeline').innerHTML=EXAMENES.map(e=>{
+    let cls='';if(sem>e.hi)cls='done';else if(sem>=e.lo&&sem<=e.hi)cls='now';
+    return `<div class="tl ${cls}"><div class="w">semana ${e.w} · ${fmtDiaMes(fechaDeSemana(e.lo))} a ${fmtDiaMes(fechaDeSemana(e.hi))}</div><div class="t">${e.t}</div></div>`;
+  }).join('');
+  let idxNow=-1; HITOS.forEach((x,i)=>{if(sem>=x.w)idxNow=i;});
+  document.getElementById('hitos').innerHTML=HITOS.map((x,i)=>{
+    let cls=''; if(i<idxNow)cls='done'; else if(i===idxNow)cls='now';
+    return `<div class="tl ${cls}"><div class="w">semana ${x.w} · ${fmtDiaMes(fechaDeSemana(x.w))}</div><div class="t">${x.t}</div></div>`;
+  }).join('');
+
+  // marcar sexo en sheet
+  document.querySelectorAll('#sexbar-sheet button').forEach(x=>x.classList.toggle('on',x.dataset.s===sexo));
+}
+
+/* ====== NAV DOTS ====== */
+const pages=document.getElementById('pages');
+pages.addEventListener('scroll',()=>{
+  const i=Math.round(pages.scrollLeft/pages.clientWidth);
+  document.querySelectorAll('#dots i').forEach((d,k)=>d.classList.toggle('on',k===i));
+},{passive:true});
+
+/* ====== SHEET ====== */
+document.querySelectorAll('#sexbar-sheet button').forEach(btn=>{
+  btn.onclick=()=>{document.querySelectorAll('#sexbar-sheet button').forEach(x=>x.classList.remove('on'));btn.classList.add('on');};
+});
+function openSheet(){
+  document.getElementById('in-nombre').value=(nombre==='Pepita'?'':nombre);
+  document.querySelectorAll('#sexbar-sheet button').forEach(x=>x.classList.toggle('on',x.dataset.s===sexo));
+  document.getElementById('sheet').classList.add('open');
+}
+function closeSheet(){document.getElementById('sheet').classList.remove('open');}
+function guardar(){
+  const n=document.getElementById('in-nombre').value.trim();
+  nombre=n||'Pepita';
+  const sel=document.querySelector('#sexbar-sheet button.on');
+  sexo=sel?sel.dataset.s:'x';
+  localStorage.setItem(KEY_N,nombre);
+  localStorage.setItem(KEY_S,sexo);
+  render();
+  closeSheet();
+}
+document.getElementById('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet();};
+
+/* ====== CORAZONES DE FONDO ====== */
+(function(){
+  const cont=document.getElementById('bgHearts');
+  const N=7;
+  for(let i=0;i<N;i++){
+    const s=document.createElement('span');
+    s.textContent='♥';
+    s.style.left=(Math.random()*100)+'%';
+    s.style.fontSize=(10+Math.random()*12)+'px';
+    s.style.animationDuration=(14+Math.random()*12)+'s';
+    s.style.animationDelay=(-Math.random()*20)+'s';
+    cont.appendChild(s);
+  }
+})();
+
+/* ====== ARRANQUE + AUTO-ACTUALIZACIÓN DIARIA ====== */
+render();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+let _dia=hoy0().getTime();
+setInterval(()=>{const t=hoy0().getTime();if(t!==_dia){_dia=t;render();}},60000);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+
+</script>
+</body>
+</html>
